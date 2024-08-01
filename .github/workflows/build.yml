@@ -16,7 +16,8 @@ env:
   ChatID_APK: "-1002022770110"
   ChatID_AAB: "-1002022770110"
   ChatID_LOG: "5419377045"
-  BotToken: "7014683250:AAH9RXxVVxUHndh3zX7zJCen5WVIMmrG_EE"
+  BotToken: "5541471253:AAFGq-cwlYERC9nSYc68_94bWOH0Fx1KkVU"
+  BotTokenLog: "7014683250:AAH9RXxVVxUHndh3zX7zJCen5WVIMmrG_EE"
 
 jobs:
   EncodeKeystoreToBase64:
@@ -132,14 +133,14 @@ jobs:
     if: always()
     steps:
       - name: Send Failure Notification
-        if: ${{ failure() || needs.buildAndroidAPK.result == 'failure' || needs.buildAndroidAAB.result == 'failure' }}
+        if: ${{ failure() || needs.buildAndroidAPK.result == 'failure' || needs.buildAndroidAAB.result == 'failure' || needs.sendTelegramNotify.result == 'failure' }}
         run: |
           LOG_URL="${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
           USERNAME="${{ github.actor }}"
-          curl -s -X POST https://api.telegram.org/bot${{ env.BotToken }}/sendMessage -d chat_id=${{ env.ChatID_LOG }} -d text="Build failed for ${{ env.APP_NAME }} by $USERNAME. Logs: $LOG_URL"
+          curl -s -X POST https://api.telegram.org/bot${{ env.BotTokenLog }}/sendMessage -d chat_id=${{ env.ChatID_LOG }} -d text="Build failed for ${{ env.APP_NAME }} by $USERNAME. Logs: $LOG_URL"
       - name: Send Success Notification
-        if: ${{ success() && needs.buildAndroidAPK.result == 'success' && needs.buildAndroidAAB.result == 'success' }}
+        if: ${{ success() && needs.buildAndroidAPK.result == 'success' && needs.buildAndroidAAB.result == 'success' && needs.sendTelegramNotify.result == 'success' }}
         run: |
           LOG_URL="${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
           USERNAME="${{ github.actor }}"
-          curl -s -X POST https://api.telegram.org/bot${{ env.BotToken }}/sendMessage -d chat_id=${{ env.ChatID_LOG }} -d text="Build succeeded for ${{ env.APP_NAME }} by $USERNAME. Logs: $LOG_URL"
+          curl -s -X POST https://api.telegram.org/bot${{ env.BotTokenLog }}/sendMessage -d chat_id=${{ env.ChatID_LOG }} -d text="Build succeeded for ${{ env.APP_NAME }} by $USERNAME. Logs: $LOG_URL"
